@@ -10,36 +10,51 @@ export default function AuthProvider({ children }) {
   const [token, setToken] = useState(null);
   const { clearCart } = useCart();
   const [loading, setLoading] = useState(true);
+  const syncUserWithBackend = async (currentUser) => {
+    try {
+      const mytoken = await currentUser.getIdToken(true);
+      setToken(mytoken);
+      
+      const result = await api.post(
+        "/api/users/sync",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${mytoken}`,
+          },
+        }
+      );
+
+      const { photoURL } = currentUser;
+      const newUser = {
+        ...result.data,
+        photoURL: result.data.profileImage?.url || photoURL,
+      };
+      setUser(newUser);
+    } catch (error) {
+      console.error("Error syncing user:", error);
+      setUser(currentUser);
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
-        const mytoken = await currentUser.getIdToken(true);
-        setToken(mytoken);
-        // sync user with backend
-        const result = await api.post(
-          "/api/users/sync",
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${mytoken}`,
-            },
-          }
-        );
-
-        const { photoURL } = currentUser;
-        const newUser = {
-          ...result.data,
-          photoURL,
-        };
-        setUser(newUser);
+        await syncUserWithBackend(currentUser);
       } else {
         setUser(null);
+        setToken(null);
       }
       setLoading(false);
     });
-    //Cleanup subscription on unmount
     return unsubscribe;
   }, []);
+
+  const refreshUser = async () => {
+    if (auth.currentUser) {
+      await syncUserWithBackend(auth.currentUser);
+    }
+  };
 
   // LOGOUT FUNCTION
   const logout = async () => {
@@ -49,7 +64,7 @@ export default function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, logout,token }}>
+    <AuthContext.Provider value={{ user, loading, logout, token, refreshUser }}>
       {!loading && children}
     </AuthContext.Provider>
   );

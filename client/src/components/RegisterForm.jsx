@@ -1,17 +1,44 @@
-import { EnvelopeIcon, LockClosedIcon } from "@heroicons/react/24/outline";
+import { EnvelopeIcon, LockClosedIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
+import api from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 import { loginWithGoogle, registerWithEmail } from "../firebase";
 import Button from "./ui/Button";
 import Input from "./ui/Input";
 
 export default function RegisterForm() {
+  const { refreshUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [photo, setPhoto] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setError("Image must be under 5MB");
+        return;
+      }
+      
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        setError("Only JPG, PNG, and WEBP images are allowed");
+        return;
+      }
+      
+      setPhoto(file);
+      setPhotoPreview(URL.createObjectURL(file));
+      setError("");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,7 +51,45 @@ export default function RegisterForm() {
 
     setLoading(true);
     try {
-      await registerWithEmail(email, password);
+      // Step 1: Register with Firebase
+      const userCredential = await registerWithEmail(email, password);
+      console.log(userCredential.user)
+      const token = await userCredential.user.getIdToken();
+      console.log(token)
+      // Step 2: Sync user with MongoDB (create user record)
+      console.log('Syncing user with MongoDB...');
+      await api.post('/api/users/sync', {}, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      console.log('User synced successfully');
+
+      // Step 3: Upload photo if provided
+      if (photo) {
+        console.log('Uploading photo...');
+        const formData = new FormData();
+        formData.append('photo', photo);
+
+        try {
+          const photoResponse = await api.post('/api/users/upload-photo', formData, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+          console.log('Photo uploaded successfully:', photoResponse.data);
+          // Refresh user state to show photo in navbar immediately
+          await refreshUser();
+        } catch (photoError) {
+          console.error('Photo upload failed:', photoError.response?.data || photoError.message);
+          // Don't throw error - registration succeeded, just photo failed
+        }
+      } else {
+        // If no photo, still refresh to make sure we have the latest user data from sync
+        await refreshUser();
+      }
+
       navigate("/"); // Redirect to home on success
     } catch (err) {
       setError(err.message);
@@ -95,6 +160,60 @@ export default function RegisterForm() {
               leftIcon={<LockClosedIcon className="w-5 h-5" />}
               required
             />
+
+            {/* Profile Photo Upload */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Profile Photo (Optional)
+              </label>
+              <div className="flex items-center gap-4">
+                {/* Photo Preview */}
+                <div className="w-20 h-20 rounded-full border-2 border-gray-300 overflow-hidden bg-gray-100 flex-shrink-0">
+                  {photoPreview ? (
+                    <img 
+                      src={photoPreview} 
+                      alt="Preview" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <UserCircleIcon className="w-12 h-12 text-gray-400" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Upload Button */}
+                <div className="flex-1 flex items-center gap-3">
+                  <label className="cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png,image/webp"
+                      onChange={handlePhotoChange}
+                      className="hidden"
+                    />
+                    <span className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors inline-block text-sm">
+                      Choose Photo
+                    </span>
+                  </label>
+
+                  {photoPreview && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPhoto(null);
+                        setPhotoPreview(null);
+                      }}
+                      className="text-sm text-red-600 hover:text-red-700"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              </div>
+              <p className="text-xs text-gray-500">
+                JPG, PNG or WEBP. Max 5MB.
+              </p>
+            </div>
 
             <Button
               type="submit"

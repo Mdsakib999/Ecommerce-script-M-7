@@ -13,6 +13,14 @@ const userSchema = new mongoose.Schema(
       unique: true,
     },
     name: String,
+profileImage: {
+  url: {
+    type: String,
+  },
+  publicId: {
+    type: String,
+  },
+},
 
     // ⭐ Admin role
     isAdmin: {

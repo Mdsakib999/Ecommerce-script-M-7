@@ -2,20 +2,53 @@ const User = require('../models/User');
 const uploadUserPhoto = require('../utils/uploadUserPhoto');
 const cloudinary = require('../config/cloudinary');
 exports.syncUser = async (req, res) => {
-  const { uid, email, name } = req.user;
+  const { uid, email, picture } = req.user;
+  const name = req.body.name || req.user.name; // Prioritize body name (manual), then token name (google)
 
   let user = await User.findOne({ firebaseUid: uid });
+
+  if (user && user.isBanned) {
+    return res.status(403).json({ message: "Your account has been banned. Please contact support." });
+  }
 
   if (!user) {
     user = await User.create({
       firebaseUid: uid,
       email,
       name: name || email.split("@")[0],
+      googlePhotoUrl: picture,
       isAdmin: false, // default
     });
+  } else if (picture && user.googlePhotoUrl !== picture) {
+    // Update google photo if changed
+    user.googlePhotoUrl = picture;
+    await user.save();
   }
 
   res.json(user);
+};
+
+// Toggle Ban Status (Admin only)
+exports.toggleBanStatus = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Prevent banning self
+    if (user.firebaseUid === req.user.uid) {
+      return res.status(400).json({ message: "You cannot ban yourself." });
+    }
+
+    user.isBanned = !user.isBanned;
+    await user.save();
+
+    res.json({
+      message: user.isBanned ? 'User has been banned' : 'User access restored',
+      isBanned: user.isBanned
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
+  }
 };
 
 // Upload or update user profile photo
@@ -78,6 +111,29 @@ exports.uploadPhoto = async (req, res) => {
       message: 'Photo upload failed',
       error: error.message
     });
+  }
+};
+
+// Get all users (Admin only)
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}).sort({ createdAt: -1 });
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+// Delete user (Admin only)
+exports.deleteUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    await user.deleteOne();
+    res.json({ message: 'User removed' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
   }
 };
 

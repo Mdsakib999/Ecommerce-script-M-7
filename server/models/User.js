@@ -13,21 +13,26 @@ const userSchema = new mongoose.Schema(
       unique: true,
     },
     name: String,
-profileImage: {
-  url: {
-    type: String,
-  },
-  publicId: {
-    type: String,
-  },
-},
+    googlePhotoUrl: String,
+    profileImage: {
+      url: {
+        type: String,
+      },
+      publicId: {
+        type: String,
+      },
+    },
 
     // ⭐ Admin role
     isAdmin: {
       type: Boolean,
       default: false,
     },
+    isBanned: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
-module.exports = mongoose.model('User',userSchema);
+module.exports = mongoose.model('User', userSchema);

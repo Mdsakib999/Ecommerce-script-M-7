@@ -9,6 +9,7 @@ import Input from "./ui/Input";
 
 export default function RegisterForm() {
   const { refreshUser } = useAuth();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -53,33 +54,30 @@ export default function RegisterForm() {
     try {
       // Step 1: Register with Firebase
       const userCredential = await registerWithEmail(email, password);
-      console.log(userCredential.user)
       const token = await userCredential.user.getIdToken();
-      console.log(token)
+
       // Step 2: Sync user with MongoDB (create user record)
-      console.log('Syncing user with MongoDB...');
-      await api.post('/api/users/sync', {}, {
-        headers: {
-          'Authorization': `Bearer ${token}`
+      await api.post('/api/users/sync', 
+        { name: name }, // Send name in body
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         }
-      });
-      console.log('User synced successfully');
+      );
 
       // Step 3: Upload photo if provided
       if (photo) {
-        console.log('Uploading photo...');
         const formData = new FormData();
         formData.append('photo', photo);
 
         try {
-          const photoResponse = await api.post('/api/users/upload-photo', formData, {
+          await api.post('/api/users/upload-photo', formData, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'multipart/form-data'
             }
           });
-          console.log('Photo uploaded successfully:', photoResponse.data);
-          // Refresh user state to show photo in navbar immediately
           await refreshUser();
         } catch (photoError) {
           console.error('Photo upload failed:', photoError.response?.data || photoError.message);
@@ -131,6 +129,16 @@ export default function RegisterForm() {
 
           {/* Register Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              type="text"
+              label="Full Name"
+              placeholder="John Doe"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              leftIcon={<UserCircleIcon className="w-5 h-5" />}
+              required
+            />
+
             <Input
               type="email"
               label="Email Address"

@@ -39,7 +39,6 @@ export default function CartPage() {
       alert('Order placed successfully!');
       clearCart();
       navigate(`/order-success/${order._id}`);
-      console.log(order)
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.message || 'Failed to place order');

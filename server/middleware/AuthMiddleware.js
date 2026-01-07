@@ -12,6 +12,7 @@ async function verifyFirebaseToken(req, res, next) {
         req.user = {
             uid: decoded.uid,
             email: decoded.email,
+            picture: decoded.picture,
         };
         next();
     } catch (error) {

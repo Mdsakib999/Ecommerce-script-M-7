@@ -25,7 +25,6 @@ export async function placeOrder(orderItems, shippingAddress = null, paymentMeth
       headers: { Authorization: `Bearer ${idToken}` },
       // axios will set Content-Type: application/json automatically for an object body
     });
-    console.log(idToken)
     return resp.data;
   } catch (err) {
     // Normalize message so UI can display something meaningful

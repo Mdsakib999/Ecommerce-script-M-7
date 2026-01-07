@@ -121,7 +121,7 @@ export default function Navbar() {
                     <UserCircleIcon className="w-8 h-8 text-gray-600" />
                   )}
                   <span className="text-sm font-medium text-gray-700">
-                    {user.displayName || user.email?.split('@')[0]}
+                    {user.name}
                   </span>
                   <ChevronDownIcon className={`w-4 h-4 text-gray-600 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>

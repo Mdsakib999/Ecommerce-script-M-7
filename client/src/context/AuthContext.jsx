@@ -32,7 +32,15 @@ export default function AuthProvider({ children }) {
       };
       setUser(newUser);
     } catch (error) {
+      if (error.response?.status === 403) {
+          await signOut(auth);
+          setUser(null);
+          setToken(null);
+          alert(error.response.data.message); // Notify user they are banned
+          return;
+      }
       console.error("Error syncing user:", error);
+      // Only set partial user if unexpected error, NOT if banned
       setUser(currentUser);
     }
   };

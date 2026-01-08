@@ -1,5 +1,6 @@
 import { PencilIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 import Loader from "../Loader";
@@ -57,23 +58,30 @@ export default function ProductAdmin() {
   };
 
   // Handle Delete Product
-  async function handleDelete(id) {
-    if (!window.confirm("Are you sure you want to delete this product?")) {
-      return;
-    }
-
-    try {
-      await api.delete(`/api/products/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      // Remove deleted product from state list
-      setProducts((prev) => prev.filter((p) => p._id !== id));
-    } catch (error) {
-      console.error(error);
-      alert("Failed to delete product");
-    }
+  function handleDelete(id) {
+    toast("Are you sure you want to delete this product?", {
+      action: {
+        label: "Delete",
+        onClick: async () => {
+          try {
+            await api.delete(`/api/products/${id}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            // Remove deleted product from state list
+            setProducts((prev) => prev.filter((p) => p._id !== id));
+            toast.success("Product deleted successfully");
+          } catch (error) {
+            console.error(error);
+            toast.error("Failed to delete product");
+          }
+        }
+      },
+      cancel: {
+        label: "Cancel"
+      }
+    });
   }
 
   if (loading) return <Loader fullPage />;
@@ -121,27 +129,20 @@ export default function ProductAdmin() {
   return (
     <div className="max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Products</h1>
-          <p className="text-gray-600 mt-1">
-            Manage your product inventory ({products.length} products)
-          </p>
+           <h1 className="text-2xl font-bold text-gray-900">Products</h1>
+           <p className="mt-1 text-sm text-gray-500">Manage your product inventory ({products.length})</p>
         </div>
-        <Button
-          variant="primary"
-          size="lg"
-          onClick={() => setShowCreateForm(true)}
-          leftIcon={<PlusIcon className="w-5 h-5" />}
-        >
-          Add New Product
+        <Button onClick={() => setShowCreateForm(true)} leftIcon={<PlusIcon className="w-5 h-5" />}>
+          Add Product
         </Button>
       </div>
 
       {/* Products Table */}
       <div className="bg-white rounded-xl shadow-md overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="min-w-[1000px] divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">

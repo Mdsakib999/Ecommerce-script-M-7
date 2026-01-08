@@ -1,12 +1,12 @@
 import {
-    ArrowRightOnRectangleIcon,
-    Bars3Icon,
-    ChevronDownIcon,
-    ShoppingBagIcon,
-    ShoppingCartIcon,
-    UserCircleIcon,
-    WrenchScrewdriverIcon,
-    XMarkIcon
+  ArrowRightOnRectangleIcon,
+  Bars3Icon,
+  ChevronDownIcon,
+  ShoppingBagIcon,
+  ShoppingCartIcon,
+  UserCircleIcon,
+  WrenchScrewdriverIcon,
+  XMarkIcon
 } from "@heroicons/react/24/outline";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
@@ -22,6 +22,7 @@ export default function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const dropdownRef = useRef(null);
+  const mobileMenuRef = useRef(null);
   const cartCount = cart.length;
 
   // Detect scroll
@@ -46,13 +47,25 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target) && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [mobileMenuOpen]);
+
   return (
     <header className={`sticky top-0 z-1000 border-b shadow-md transition-all duration-300 ${
       isScrolled 
         ? 'bg-white border-gray-200' 
         : 'glass border-white/20'
     }`}>
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav ref={mobileMenuRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
@@ -152,7 +165,7 @@ export default function Navbar() {
                 )}
               </div>
             ) : (
-              <Link to="/login">
+              <Link to="/login" className="hidden md:inline-block">
                 <button className="px-4 py-2 bg-gradient-accent text-white rounded-lg font-medium hover:bg-cyan-600 transition-colors">
                   Sign In
                 </button>

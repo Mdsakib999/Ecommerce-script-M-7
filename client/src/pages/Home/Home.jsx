@@ -21,18 +21,22 @@ import Loader from "../../components/Loader";
 import ProductCard from "../../components/ProductCard";
 import Button from "../../components/ui/Button";
 
-// Import hero images
+// New Components
+import BrandStory from "../../components/home/BrandStory";
+import NewArrivals from "../../components/home/NewArrivals";
+import OfferBanner from "../../components/home/OfferBanner";
+import Testimonials from "../../components/home/Testimonials";
+import TrendingProducts from "../../components/home/TrendingProducts";
 
 export default function Home() {
-  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchFeaturedProducts = async () => {
+    const fetchProducts = async () => {
       try {
         const { data } = await api.get("/api/products");
-        // Get first 4 products as featured
-        setFeaturedProducts(data.slice(0, 4));
+        setProducts(data);
       } catch (error) {
         console.error("Error fetching products:", error);
       } finally {
@@ -40,8 +44,12 @@ export default function Home() {
       }
     };
 
-    fetchFeaturedProducts();
+    fetchProducts();
   }, []);
+
+  const featuredProducts = products.slice(0, 4);
+
+  if (loading) return <Loader />;
 
   return (
     <div className="min-h-screen">
@@ -118,7 +126,7 @@ export default function Home() {
 
               {/* Premium Stats Section */}
               <div 
-                className="grid grid-cols-3 gap-8 pt-10 mt-4 border-t border-white/10 animate-fade-in-up"
+                className="flex justify-center sm:justify-start flex-wrap gap-12 pt-10 mt-4 border-t border-white/10 animate-fade-in-up"
                 style={{ animationDelay: '0.5s' }}
               >
                 <div className="text-left group">
@@ -196,10 +204,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Products Section */}
+      {/* New Arrivals Section */}
+      <NewArrivals products={products} />
+
+      {/* Offer Banner Section */}
+      <OfferBanner />
+
+      {/* Featured Products Section (Existing) */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Section Header */}
           <div className="text-center mb-12 animate-fade-in-up">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
               Featured Products
@@ -209,45 +222,42 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Products Grid */}
-          {loading ? (
-            <Loader />
-          ) : (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-                {featuredProducts.map((product, index) => (
-                  <div
-                    key={product._id}
-                    className="animate-fade-in-up"
-                    style={{ animationDelay: `${index * 100}ms` }}
-                  >
-                    <ProductCard product={product} />
-                  </div>
-                ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {featuredProducts.map((product, index) => (
+              <div
+                key={product._id}
+                className="animate-fade-in-up"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <ProductCard product={product} />
               </div>
+            ))}
+          </div>
 
-              {/* View All Button */}
-              <div className="text-center">
-                <Link to="/products">
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    rightIcon={<ArrowRightIcon className="w-5 h-5" />}
-                  >
-                    View All Products
-                  </Button>
-                </Link>
-              </div>
-            </>
-          )}
+          <div className="text-center">
+            <Link to="/products">
+              <Button
+                variant="primary"
+                size="lg"
+                rightIcon={<ArrowRightIcon className="w-5 h-5" />}
+              >
+                View All Products
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Benefits Section */}
+      {/* Trending Products Section */}
+      <TrendingProducts products={products} />
+
+      {/* Brand Story Section */}
+      <BrandStory />
+
+      {/* Benefits Section (Existing - moved down) */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Benefit 1 */}
             <div className="text-center group">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-2xl mb-4 group-hover:bg-purple-200 transition-colors">
                 <TruckIcon className="w-8 h-8 text-purple-600" />
@@ -258,7 +268,6 @@ export default function Home() {
               <p className="text-gray-600 text-sm">On orders over ৳1000</p>
             </div>
 
-            {/* Benefit 2 */}
             <div className="text-center group">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-2xl mb-4 group-hover:bg-green-200 transition-colors">
                 <ShieldCheckIcon className="w-8 h-8 text-green-600" />
@@ -269,7 +278,6 @@ export default function Home() {
               <p className="text-gray-600 text-sm">100% secure transactions</p>
             </div>
 
-            {/* Benefit 3 */}
             <div className="text-center group">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-2xl mb-4 group-hover:bg-blue-200 transition-colors">
                 <PhoneIcon className="w-8 h-8 text-blue-600" />
@@ -282,7 +290,6 @@ export default function Home() {
               </p>
             </div>
 
-            {/* Benefit 4 */}
             <div className="text-center group">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-100 rounded-2xl mb-4 group-hover:bg-amber-200 transition-colors">
                 <ArrowPathIcon className="w-8 h-8 text-amber-600" />
@@ -295,6 +302,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Testimonials Section */}
+      <Testimonials />
 
       {/* Newsletter CTA */}
       <section className="py-16 bg-gradient-to-br from-slate-800 to-slate-900">

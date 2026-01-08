@@ -27,6 +27,19 @@ export default function UpdateProductForm({
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data } = await api.get("/api/categories");
+        setCategories(data);
+      } catch (err) {
+        console.error("Failed to load categories", err);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   // Populate form with product data
   useEffect(() => {
@@ -131,15 +144,27 @@ export default function UpdateProductForm({
           />
 
           {/* Category */}
-          <Input
-            type="text"
-            label="Category"
-            placeholder="e.g., Electronics"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            leftIcon={<FolderIcon className="w-5 h-5" />}
-            required
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="flex items-center gap-2">
+                <FolderIcon className="w-5 h-5 text-gray-400" />
+                <span>Category</span>
+              </div>
+            </label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+            >
+              <option value="">Select Category</option>
+              {categories.map((cat) => (
+                <option key={cat._id} value={cat.name}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* Price */}
           <Input

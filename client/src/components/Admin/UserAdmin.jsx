@@ -1,5 +1,6 @@
 import { CheckCircleIcon, NoSymbolIcon, TrashIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 import Loader from "../Loader";
@@ -33,35 +34,53 @@ export default function UserAdmin() {
     if (token) fetchUsers();
   }, [token]);
 
-  const handleBanToggle = async (user) => {
+  const handleBanToggle = (user) => {
     const action = user.isBanned ? "unban" : "ban";
-    if (!window.confirm(`Are you sure you want to ${action} this user?`)) return;
-    
-    try {
-      const { data } = await api.put(`/api/users/${user._id}/ban`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      
-      // Update local state without refetching
-      setUsers((prev) => prev.map(u => 
-          u._id === user._id ? { ...u, isBanned: data.isBanned } : u
-      ));
-      
-    } catch (err) {
-      alert(err.response?.data?.message || err.message || "Action failed");
-    }
+    toast(`Are you sure you want to ${action} this user?`, {
+        action: {
+            label: 'Confirm',
+            onClick: async () => {
+                try {
+                    const { data } = await api.put(`/api/users/${user._id}/ban`, {}, {
+                      headers: { Authorization: `Bearer ${token}` },
+                    });
+                    
+                    // Update local state without refetching
+                    setUsers((prev) => prev.map(u => 
+                        u._id === user._id ? { ...u, isBanned: data.isBanned } : u
+                    ));
+                    toast.success(`User ${action}ned successfully`);
+                } catch (err) {
+                    toast.error(err.response?.data?.message || err.message || "Action failed");
+                }
+            }
+        },
+        cancel: {
+            label: 'Cancel'
+        }
+    });
   };
 
-  const handleDelete = async (userId) => {
-    if (!window.confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
-    try {
-      await api.delete(`/api/users/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUsers((prev) => prev.filter((u) => u._id !== userId));
-    } catch (err) {
-      alert(err.response?.data?.message || err.message || "Delete failed");
-    }
+  const handleDelete = (userId) => {
+    toast("Are you sure you want to delete this user? This action cannot be undone.", {
+        action: {
+            label: 'Delete',
+            onClick: async () => {
+                try {
+                  await api.delete(`/api/users/${userId}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                  });
+                  setUsers((prev) => prev.filter((u) => u._id !== userId));
+                  toast.success("User deleted successfully");
+                } catch (err) {
+                  toast.error(err.response?.data?.message || err.message || "Delete failed");
+                }
+            }
+        },
+        cancel: {
+            label: 'Cancel'
+        }
+    });
   };
 
   if (loading) return <Loader fullPage />;
@@ -69,7 +88,7 @@ export default function UserAdmin() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
            <h1 className="text-2xl font-bold text-gray-900">Users</h1>
            <p className="mt-1 text-sm text-gray-500">Manage all registered users ({users.length})</p>
@@ -78,7 +97,7 @@ export default function UserAdmin() {
 
       <div className="bg-white shadow overflow-hidden sm:rounded-lg border border-gray-200">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="min-w-[1000px] divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">

@@ -13,6 +13,7 @@ import AdminLayout from "../components/Admin/AdminLayout";
 import ProductAdmin from "../components/Admin/ProductAdmin";
 import OrderAdmin from "../components/Admin/OrderAdmin";
 import UserAdmin from "../components/Admin/UserAdmin";
+import CategoryAdmin from "../components/Admin/CategoryAdmin";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -59,6 +60,7 @@ export const router = createBrowserRouter([
     children: [
       {index: true, element: <div>Admin Home</div>},
       {path: "products", Component:ProductAdmin},
+      {path: "categories", Component:CategoryAdmin},
       {path: "orders", Component: OrderAdmin},
       {path: "users", Component: UserAdmin},
     ]

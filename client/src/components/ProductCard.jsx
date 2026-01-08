@@ -28,7 +28,7 @@ const ProductCard = ({ product }) => {
   const isLowStock = product.countInStock > 0 && product.countInStock <= 5;
 
   return (
-    <div className="group w-full bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col hover-lift">
+    <div className="group w-full bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
       <Link to={`/products/${product._id}`} className="relative">
         {/* Stock Status Badge */}
         <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">

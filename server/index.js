@@ -4,6 +4,7 @@ const cors = require('cors');
 const connectDB = require("./utils/db");
 const path = require('path');
 const productRoutes = require('./routes/products');
+const categoryRoutes = require('./routes/categories');
 const orderRoutes = require('./routes/orders');
 const userRoutes = require('./routes/users')
 const allowedOrigins = [
@@ -34,6 +35,7 @@ const multer = require("multer");
 
 //? Routes
 app.use('/api/products', productRoutes);
+app.use('/api/categories',categoryRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes)
 app.use((err, req, res, next) => {

@@ -103,15 +103,24 @@ exports.getAllOrders = async (req, res) => {
     res.status(500).json({ message: 'Server Error' });
   }
 };
-
-exports.updateToDelivered = async (req, res) => {
+exports.updateOrderStatus = async (req, res) => {
   try {
+    const { status } = req.body;
     const order = await Order.findById(req.params.id);
 
     if (order) {
-      order.isDelivered = true;
-      order.status = 'Delivered';
-      order.deliveredAt = Date.now();
+      if (order.isDelivered && status === 'Cancelled') {
+        return res.status(400).json({ message: 'Cannot cancel a delivered order' });
+      }
+
+      order.status = status;
+      if (status === 'Delivered') {
+        order.isDelivered = true;
+        order.deliveredAt = Date.now();
+      } else {
+        order.isDelivered = false;
+        order.deliveredAt = null;
+      }
 
       const updatedOrder = await order.save();
       res.json(updatedOrder);
@@ -119,6 +128,26 @@ exports.updateToDelivered = async (req, res) => {
       res.status(404).json({ message: 'Order not found' });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
+// exports.updateToDelivered = async (req, res) => {
+//   try {
+//     const order = await Order.findById(req.params.id);
+
+//     if (order) {
+//       order.isDelivered = true;
+//       order.status = 'Delivered';
+//       order.deliveredAt = Date.now();
+
+//       const updatedOrder = await order.save();
+//       res.json(updatedOrder);
+//     } else {
+//       res.status(404).json({ message: 'Order not found' });
+//     }
+//   } catch (error) {
+//     res.status(500).json({ message: 'Server Error' });
+//   }
+// };
+
+

@@ -1,17 +1,18 @@
-import { NavLink } from 'react-router';
 import {
-  ShoppingCartIcon,
   ClipboardDocumentIcon,
-  UserGroupIcon
-} from '@heroicons/react/20/solid';
+  WrenchScrewdriverIcon,
+  ShoppingCartIcon,
+  UserGroupIcon,
+} from "@heroicons/react/20/solid";
+import { NavLink } from "react-router";
 
 function AdminSidebar() {
   return (
     <nav className="mt-10">
       <ul>
         <li>
-          <NavLink 
-            to="/admin/products" 
+          <NavLink
+            to="/admin/products"
             className="flex items-center px-3 py-2 rounded-md hover:bg-gray-700"
           >
             <ShoppingCartIcon className="w-5 h-5 mr-2 text-gray-300" />
@@ -19,7 +20,16 @@ function AdminSidebar() {
           </NavLink>
         </li>
         <li>
-          <NavLink 
+          <NavLink
+            to="/admin/categories"
+            className="flex items-center px-3 py-2 rounded-md hover:bg-gray-700"
+          >
+            <WrenchScrewdriverIcon className="w-5 h-5 mr-2 text-gray-300" />
+            Categories
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
             to="/admin/orders"
             className="flex items-center px-3 py-2 rounded-md hover:bg-gray-700"
           >
@@ -28,7 +38,7 @@ function AdminSidebar() {
           </NavLink>
         </li>
         <li>
-          <NavLink 
+          <NavLink
             to="/admin/users"
             className="flex items-center px-3 py-2 rounded-md hover:bg-gray-700"
           >

@@ -1,5 +1,6 @@
 import { EyeIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 import Loader from "../Loader";
@@ -37,21 +38,38 @@ export default function OrderAdmin() {
     if (token) fetchOrders();
   }, [token]);
 
-  const handleDeliver = async (orderId) => {
-    if (!window.confirm("Mark this order as delivered?")) return;
-    try {
-      await api.put(`/api/orders/${orderId}/deliver`, {}, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        }
-      });
-      fetchOrders(); 
-      if (selectedOrder && selectedOrder._id === orderId) {
-          setSelectedOrder(prev => ({...prev, isDelivered: true, status: 'Delivered', deliveredAt: new Date().toISOString()}));
+  const handleStatusChange = async (orderId, newStatus) => {
+    // Optimistic update
+    setOrders((prev) =>
+      prev.map((order) =>
+        order._id === orderId ? { ...order, status: newStatus } : order
+      )
+    );
+
+    const promise = api.put(
+      `/api/orders/${orderId}/status`,
+      { status: newStatus },
+      {
+        headers: { Authorization: `Bearer ${token}` },
       }
-    } catch (err) {
-      alert(err.response?.data?.message || err.message || "Update failed");
-    }
+    );
+    toast.promise(promise, {
+      loading: "Updating status...",
+      success: (data) => {
+        // Update with server response to be sure
+        setOrders((prev) =>
+          prev.map((order) =>
+            order._id === orderId ? data.data : order
+          )
+        );
+        return `Order status updated to ${newStatus}`;
+      },
+      error: (err) => {
+        // Revert on error
+        fetchOrders();
+        return err.response?.data?.message || "Failed to update status";
+      },
+    });
   };
 
   if (loading) return <Loader fullPage />;
@@ -59,7 +77,7 @@ export default function OrderAdmin() {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Orders</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-6 px-4 sm:px-0">Orders</h1>
       
       {orders.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-xl shadow-md">
@@ -77,7 +95,7 @@ export default function OrderAdmin() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Delivered</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -88,12 +106,27 @@ export default function OrderAdmin() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.createdAt?.substring(0, 10)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">৳{order.totalPrice?.toFixed(2)}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                             order.status === 'Delivered' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                            {order.status || 'Processing'}
-                        </span>
-                    </td>
+                    <select
+                      value={order.status}
+                      onChange={(e) =>
+                        handleStatusChange(order._id, e.target.value)
+                      }
+                      className={`block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm rounded-md ${
+                        order.status === "Delivered"
+                          ? "bg-green-100 text-green-800"
+                          : order.status === "Shipped"
+                          ? "bg-blue-100 text-blue-800"
+                          : order.status === "Cancelled"
+                          ? "bg-red-100 text-red-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}
+                    >
+                      <option value="Processing">Processing</option>
+                      <option value="Shipped">Shipped</option>
+                      <option value="Delivered">Delivered</option>
+                      <option value="Cancelled" disabled={order.status === 'Delivered'}>Cancelled</option>
+                    </select>
+                  </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {order.isDelivered ? (
                         <span className="text-green-600 font-bold">
@@ -114,16 +147,6 @@ export default function OrderAdmin() {
                             >
                                 <EyeIcon className="w-5 h-5" />
                             </Button>
-                            {!order.isDelivered && (
-                                <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    onClick={() => handleDeliver(order._id)}
-                                    className="text-cyan-600 hover:text-cyan-700"
-                                >
-                                    Mark Delivered
-                                </Button>
-                            )}
                         </div>
                     </td>
                   </tr>
@@ -152,7 +175,7 @@ export default function OrderAdmin() {
                     <div>
                         <h4 className="font-semibold text-gray-900 mb-2">Order Info</h4>
                          <p className="text-sm text-gray-600">Total: ৳{selectedOrder.totalPrice.toFixed(2)}</p>
-                         <p className="text-sm text-gray-600">Payment: {selectedOrder.paymentMethod}</p>
+                         <p className="text-sm text-gray-600">Payment: {selectedOrder.paymentMethod || 'Cash On Delivery'}</p>
                          <p className="text-sm text-gray-600">Status: {selectedOrder.status}</p>
                     </div>
                 </div>
@@ -196,17 +219,6 @@ export default function OrderAdmin() {
                         </table>
                     </div>
                 </div>
-                
-                {!selectedOrder.isDelivered && (
-                    <div className="flex justify-end pt-4 border-t">
-                        <Button 
-                            variant="primary" 
-                            onClick={() => handleDeliver(selectedOrder._id)}
-                        >
-                            Mark as Delivered
-                        </Button>
-                    </div>
-                )}
             </div>
         )}
       </Modal>

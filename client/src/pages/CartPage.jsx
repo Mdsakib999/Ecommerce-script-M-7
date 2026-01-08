@@ -5,6 +5,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
+import { toast } from 'sonner';
 import { placeOrder } from '../api/order';
 import CartItem from '../components/CartItem';
 import Button from '../components/ui/Button';
@@ -22,8 +23,8 @@ export default function CartPage() {
   const total = subtotal + shipping;
 
   const handleCheckout = async () => {
-    if (cart.length === 0) return alert('Cart is empty');
-    if (!user) return alert('Please log in to checkout');
+    if (cart.length === 0) return toast.error('Cart is empty');
+    if (!user) return toast.error('Please log in to checkout');
 
     const orderItems = cart.map(i => ({
       productId: i.productId,
@@ -36,12 +37,12 @@ export default function CartPage() {
     try {
       setLoading(true);
       const order = await placeOrder(orderItems);
-      alert('Order placed successfully!');
+      toast.success('Order placed successfully!');
       clearCart();
       navigate(`/order-success/${order._id}`);
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || 'Failed to place order');
+      toast.error(err.response?.data?.message || 'Failed to place order');
     } finally {
       setLoading(false);
     }
@@ -51,8 +52,8 @@ export default function CartPage() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Shopping Cart</h1>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">Shopping Cart</h1>
           <p className="text-gray-600">
             {cart.length === 0 ? 'Your cart is empty' : `${cart.length} item${cart.length !== 1 ? 's' : ''} in your cart`}
           </p>
@@ -60,10 +61,10 @@ export default function CartPage() {
 
         {cart.length === 0 ? (
           /* Empty Cart State */
-          <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
+          <div className="bg-white rounded-2xl shadow-sm p-8 sm:p-12 text-center">
             <div className="max-w-md mx-auto">
-              <div className="w-32 h-32 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <ShoppingBagIcon className="w-16 h-16 text-purple-600" />
+              <div className="w-24 h-24 sm:w-32 sm:h-32 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <ShoppingBagIcon className="w-12 h-12 sm:w-16 sm:h-16 text-purple-600" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
                 Your cart is empty
@@ -104,7 +105,7 @@ export default function CartPage() {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-24 space-y-6">
+              <div className="bg-white rounded-2xl shadow-lg p-6 lg:sticky lg:top-24 space-y-6">
                 <h2 className="text-2xl font-bold text-gray-900">Order Summary</h2>
                 {/* Price Breakdown */}
                 <div className="space-y-3 py-4 border-y border-gray-200">

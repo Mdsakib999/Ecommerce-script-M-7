@@ -1,5 +1,6 @@
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { createContext, useContext, useEffect, useState } from "react";
+import { toast } from "sonner";
 import api from "../api/axios";
 import { auth } from "../firebase";
 import { useCart } from "./CartContext";
@@ -36,7 +37,7 @@ export default function AuthProvider({ children }) {
           await signOut(auth);
           setUser(null);
           setToken(null);
-          alert(error.response.data.message); // Notify user they are banned
+          toast.error(error.response.data.message); // Notify user they are banned
           return;
       }
       console.error("Error syncing user:", error);

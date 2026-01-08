@@ -41,7 +41,7 @@ const ProductCard = ({ product }) => {
         </div>
 
         {/* Product Image */}
-        <div className="h-64 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden relative">
+        <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden relative">
           <img
             src={product.imageUrl}
             alt={product.name}
@@ -50,16 +50,16 @@ const ProductCard = ({ product }) => {
         </div>
 
         {/* Product Info */}
-        <div className="p-5">
+        <div className="p-4">
           <h3 className="text-lg font-semibold text-gray-900 line-clamp-1 mb-2 group-hover:text-cyan-600 transition-colors">
             {product.name}
           </h3>
-          <p className="text-sm text-gray-600 line-clamp-2 mb-4 h-10">
+          <p className="text-sm text-gray-600 line-clamp-2 h-10">
             {product.description}
           </p>
 
           {/* Price and Stock */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-2">
             <div className="text-2xl font-bold text-gray-900">
               ৳{Number(product.price).toFixed(2)}
             </div>

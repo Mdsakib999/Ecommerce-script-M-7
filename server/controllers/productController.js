@@ -99,6 +99,11 @@ exports.updateProduct = async (req, res) => {
   try {
     const updateData = { ...req.body };
 
+    // Handle isFeatured boolean conversion
+    if (updateData.isFeatured !== undefined) {
+      updateData.isFeatured = updateData.isFeatured === 'true' || updateData.isFeatured === true;
+    }
+
     // Parse specifications if sent as string
     if (updateData.specifications) {
       try {

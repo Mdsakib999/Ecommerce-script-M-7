@@ -27,6 +27,7 @@ export default function UpdateProductForm({
   const [preview, setPreview] = useState("");
   const [countInStock, setCountInStock] = useState("");
   const [category, setCategory] = useState("");
+  const [isFeatured, setIsFeatured] = useState(false);
   const [specifications, setSpecifications] = useState([
     { key: "", value: "" },
   ]);
@@ -56,6 +57,7 @@ export default function UpdateProductForm({
       setDiscountPrice(product.discountPrice?.toString() || "");
       setCountInStock(product.countInStock?.toString() || "");
       setCategory(product.category || "");
+      setIsFeatured(product.isFeatured || false);
       setPreview(product.imageUrl || ""); // show old image
       setImage(null);
 
@@ -98,6 +100,7 @@ export default function UpdateProductForm({
       formData.append("discountPrice", discountPrice);
       formData.append("countInStock", countInStock);
       formData.append("category", category);
+      formData.append("isFeatured", isFeatured);
 
       // Filter out empty specs and stringify
       const filteredSpecs = specifications.filter(
@@ -247,6 +250,18 @@ export default function UpdateProductForm({
             className="w-32 h-32 object-cover rounded-lg mt-2 border"
           />
         )}
+
+        <div>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={isFeatured}
+              onChange={(e) => setIsFeatured(e.target.checked)}
+              className="w-5 h-5 text-cyan-600 rounded focus:ring-cyan-500 border-gray-300"
+            />
+            <span className="text-gray-700 font-medium">Feature this product</span>
+          </label>
+        </div>
 
         <Input
           type="file"

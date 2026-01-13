@@ -1,12 +1,12 @@
 import {
-    CubeIcon,
-    CurrencyDollarIcon,
-    DocumentTextIcon,
-    FolderIcon,
-    MinusIcon,
-    PhotoIcon,
-    PlusIcon,
-    TagIcon,
+  CubeIcon,
+  CurrencyDollarIcon,
+  DocumentTextIcon,
+  FolderIcon,
+  MinusIcon,
+  PhotoIcon,
+  PlusIcon,
+  TagIcon,
 } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
@@ -21,6 +21,7 @@ export default function CreateProductForm({ onProductCreated, token }) {
   const [image, setImage] = useState(null);
   const [countInStock, setCountInStock] = useState("");
   const [category, setCategory] = useState("");
+  const [isFeatured, setIsFeatured] = useState(false);
   const [specifications, setSpecifications] = useState([
     { key: "", value: "" },
   ]);
@@ -73,6 +74,7 @@ export default function CreateProductForm({ onProductCreated, token }) {
       }
       formData.append("countInStock", countInStock);
       formData.append("category", category);
+      formData.append("isFeatured", isFeatured);
       formData.append("image", image); // MUST match upload.single("image")
 
       // Filter out empty specs and stringify
@@ -102,6 +104,7 @@ export default function CreateProductForm({ onProductCreated, token }) {
       setImage(null);
       setCountInStock("");
       setCategory("");
+      setIsFeatured(false);
       setSpecifications([{ key: "", value: "" }]);
 
       setTimeout(() => setSuccess(false), 3000);
@@ -213,6 +216,18 @@ export default function CreateProductForm({ onProductCreated, token }) {
             min="0"
             required
           />
+        </div>
+
+        <div>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={isFeatured}
+              onChange={(e) => setIsFeatured(e.target.checked)}
+              className="w-5 h-5 text-cyan-600 rounded focus:ring-cyan-500 border-gray-300"
+            />
+            <span className="text-gray-700 font-medium">Feature this product</span>
+          </label>
         </div>
 
         {/* Image Upload */}

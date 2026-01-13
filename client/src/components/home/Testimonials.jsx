@@ -6,7 +6,7 @@ const testimonials = [
     name: 'Sarah Mitchell',
     role: 'Fashion Blogger',
     rating: 5,
-    text: "The quality of the fabrics is simply outstanding. I've never felt so confident wearing a brand before. Shopera has completely transformed my wardrobe!",
+    text: "The quality of the fabrics is simply outstanding. I've never felt so confident wearing a brand before. Athletora has completely transformed my wardrobe!",
     initials: 'SM'
   },
   {

@@ -1,4 +1,4 @@
-# Shopera - MERN E-Commerce Platform
+# Athletora - Sports E-Commerce Platform
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)

@@ -14,9 +14,9 @@ import { Link } from "react-router";
 import "swiper/css";
 import "swiper/css/effect-fade";
 import api from "../../api/axios";
-import heroImg1 from '../../assets/about-banner.jpg';
-import heroImg2 from '../../assets/about-banner2.jpg';
-import heroImg3 from '../../assets/about-banner3.jpg';
+import heroImg1 from '../../assets/sports-hero-1.png';
+import heroImg2 from '../../assets/sports-hero-2.png';
+import heroImg3 from '../../assets/sports-hero-3.png';
 import Loader from "../../components/Loader";
 import ProductCard from "../../components/ProductCard";
 import Button from "../../components/ui/Button";
@@ -76,7 +76,7 @@ export default function Home() {
                 style={{ animationDelay: '0.1s' }}
               >
                 <SparklesIcon className="w-5 h-5 text-orange-300 animate-pulse" />
-                <span className="text-sm font-semibold tracking-wide">New Collection 2025</span>
+                <span className="text-sm font-semibold tracking-wide">2025 Sports Collection</span>
               </div>
 
               {/* Enhanced Headline with Gradient */}
@@ -84,7 +84,7 @@ export default function Home() {
                 <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-tight tracking-tight">
                   <span className="block mb-3">Elevate Your</span>
                   <span className="block bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-                    Fashion Game
+                    Game
                   </span>
                 </h1>
               </div>
@@ -111,7 +111,7 @@ export default function Home() {
                     className="w-full sm:w-auto shadow-2xl hover:shadow-orange-500/50 transition-all duration-300 hover:scale-105"
                     rightIcon={<ArrowRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
                   >
-                    Shop Now
+                    Shop Equipment
                   </Button>
                 </Link>
                 <Link to="/products">
@@ -120,7 +120,7 @@ export default function Home() {
                     size="lg"
                     className="border-2 border-cyan-400 text-cyan-300 hover:bg-cyan-400/10 hover:border-cyan-300 w-full sm:w-auto backdrop-blur-sm transition-all duration-300"
                   >
-                    View Collection
+                    Explore All Sports
                   </Button>
                 </Link>
               </div>
@@ -136,7 +136,7 @@ export default function Home() {
                 </div>
                 <div className="text-left group">
                   <div className="text-4xl font-bold bg-gradient-to-r from-orange-300 to-pink-400 bg-clip-text text-transparent group-hover:scale-110 transition-transform inline-block">50K+</div>
-                  <div className="text-slate-300 text-sm mt-1 font-medium">Happy Customers</div>
+                  <div className="text-slate-300 text-sm mt-1 font-medium">Sports Products</div>
                 </div>
                 <div className="text-left group">
                   <div className="flex items-center gap-1">
@@ -193,9 +193,9 @@ export default function Home() {
                   <div className="absolute bottom-0 left-0 right-0 z-10 p-8">
                     <div className="text-left space-y-2">
                       <p className="text-3xl font-bold text-white drop-shadow-lg">
-                        Premium Collections
+                        Performance Gear
                       </p>
-                      <p className="text-cyan-200 text-lg font-medium">Handpicked for You</p>
+                      <p className="text-cyan-200 text-lg font-medium">Built for Athletes</p>
                     </div>
                   </div>
                 </div>
@@ -216,10 +216,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 animate-fade-in-up">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Featured Products
+              Top Performance Gear
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Discover our hand-picked selection of trending items
+              Our best-selling sports equipment and apparel trusted by athletes
             </p>
           </div>
 
@@ -306,27 +306,6 @@ export default function Home() {
 
       {/* Testimonials Section */}
       <Testimonials />
-
-      {/* Newsletter CTA */}
-      <section className="py-16 bg-gradient-to-br from-slate-800 to-slate-900">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Stay Updated</h2>
-          <p className="text-slate-300 text-lg mb-8">
-            Subscribe to get special offers, free giveaways, and
-            once-in-a-lifetime deals.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="flex-1 px-6 py-3 bg-white text-gray-900 placeholder-gray-500 rounded-lg border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all"
-            />
-            <Button variant="secondary" size="lg" className="cursor-pointer">
-              Subscribe
-            </Button>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

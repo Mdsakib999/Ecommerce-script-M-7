@@ -19,7 +19,7 @@ const BrandStory = () => {
             </h2>
             <div className="space-y-6 text-gray-600 text-lg leading-relaxed">
               <p>
-                At Shopera, we believe that fashion is more than just clothing—it's a statement of individuality. 
+                At Athletora, we believe that fashion is more than just clothing—it's a statement of individuality. 
                 Our journey began with a simple mission: to create pieces that merge contemporary aesthetics with 
                 timeless elegance.
               </p>

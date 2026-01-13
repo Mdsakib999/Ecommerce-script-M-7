@@ -81,7 +81,7 @@ export default function Navbar() {
               <ShoppingBagIcon className="w-6 h-6 text-white" />
             </div>
             <span className="text-xl font-bold gradient-text hidden sm:block">
-              Shopera
+              Athletora
             </span>
           </Link>
 
@@ -100,6 +100,18 @@ export default function Navbar() {
             </Link>
 
             <Link
+              to="/about"
+              className={`text-gray-700 hover:text-cyan-600 transition-colors relative group ${
+                location.pathname === "/about" ? "text-cyan-600 font-semibold" : ""
+              }`}
+            >
+              About Us
+              {location.pathname === "/about" && (
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-accent transform scale-x-100 transition-transform origin-left"></span>
+              )}
+            </Link>
+
+            <Link
               to="/products"
               className={`text-gray-700 hover:text-cyan-600 transition-colors relative group ${
                 location.pathname === "/products"
@@ -109,6 +121,18 @@ export default function Navbar() {
             >
               Products
               {location.pathname === "/products" && (
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-accent transform scale-x-100 transition-transform origin-left"></span>
+              )}
+            </Link>
+
+            <Link
+              to="/contact"
+              className={`text-gray-700 hover:text-cyan-600 transition-colors relative group ${
+                location.pathname === "/contact" ? "text-cyan-600 font-semibold" : ""
+              }`}
+            >
+              Contact
+              {location.pathname === "/contact" && (
                 <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-accent transform scale-x-100 transition-transform origin-left"></span>
               )}
             </Link>
@@ -232,6 +256,18 @@ export default function Navbar() {
               >
                 Home
               </Link>
+              
+              <Link
+                to="/about"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  location.pathname === "/about"
+                    ? "bg-cyan-100 text-cyan-700"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                About Us
+              </Link>
 
               <Link
                 to="/products"
@@ -243,6 +279,18 @@ export default function Navbar() {
                 }`}
               >
                 Products
+              </Link>
+
+              <Link
+                to="/contact"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  location.pathname === "/contact"
+                    ? "bg-cyan-100 text-cyan-700"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                Contact
               </Link>
 
               <button

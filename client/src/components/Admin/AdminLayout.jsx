@@ -28,7 +28,7 @@ function AdminLayout() {
               <ShoppingBagIcon className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-bold text-white tracking-tight">
-              Shopera
+              Athletora
             </span>
           </Link>
           <button
@@ -42,7 +42,7 @@ function AdminLayout() {
             <AdminSidebar />
         </div>
         <div className="p-4 border-t border-gray-700 text-sm mt-auto">
-          © {new Date().getFullYear()} Shopera
+          © {new Date().getFullYear()} Athletora Limited
         </div>
       </aside>
 

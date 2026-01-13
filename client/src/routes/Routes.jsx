@@ -11,6 +11,7 @@ import RequireAuth from "../components/Dashboard/RequireAuth";
 import Root from "../components/layout/Root";
 import LoginForm from "../components/LoginForm";
 import RegisterForm from "../components/RegisterForm";
+import About from "../pages/About/About";
 import CartPage from "../pages/CartPage";
 import MyOrdersPage from "../pages/Dashboard/MyOrdersPage";
 import ProfilePage from "../pages/Dashboard/ProfilePage";
@@ -19,6 +20,7 @@ import Home from "../pages/Home/Home";
 import OrderSuccess from "../pages/OrderSuccess";
 import ProductDetailsPage from "../pages/ProductDetailsPage";
 import ProductPage from "../pages/ProductsPage";
+import Contact from "../pages/Contact/Contact";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -41,6 +43,14 @@ export const router = createBrowserRouter([
       {
         path: "products",
         Component: ProductPage,
+      },
+      {
+        path: "about",
+        Component: About,
+      },
+      {
+        path: "contact",
+        Component: Contact,
       },
       {
         path: "products/:id",

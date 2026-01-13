@@ -16,7 +16,8 @@ const productSchema = new mongoose.Schema(
             }
         ],
         isFeatured: { type: Boolean, default: false },
-        rating: { type: Number, default: 0 }
+        rating: { type: Number, default: 0 },
+        purchaseCount: { type: Number, default: 0 }
     },
     { timestamps: true }
 );

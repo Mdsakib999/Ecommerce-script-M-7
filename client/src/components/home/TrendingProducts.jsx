@@ -7,13 +7,10 @@ const TrendingProducts = ({ products }) => {
 
   // Simulate trending by taking a different slice, e.g., middle items
   // In a real app, this would come from an analytics endpoint
-  const trendingProducts =
-    products.length > 4
-      ? products.slice(
-          Math.floor(products.length / 2),
-          Math.floor(products.length / 2) + 6
-        )
-      : products;
+  // Sort by purchaseCount descending
+  const trendingProducts = [...products]
+    .sort((a, b) => (b.purchaseCount || 0) - (a.purchaseCount || 0))
+    .slice(0, 10); // Show top 10 trending items
 
   const scroll = (direction) => {
     if (scrollRef.current) {

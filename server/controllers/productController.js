@@ -48,6 +48,9 @@ exports.getProducts = async (req, res) => {
       case 'name-desc':
         sortOptions = { name: -1 };
         break;
+      case 'trending':
+        sortOptions = { purchaseCount: -1 };
+        break;
       default:
         sortOptions = { createdAt: -1 }; // Default: newest first
     }
@@ -158,7 +161,7 @@ exports.deleteProduct = async (req, res) => {
 // Create new product
 exports.createProduct = async (req, res) => {
   try {
-    const { name, description, price, discountPrice, countInStock, category, specifications, isFeatured } = req.body;
+    const { name, description, price, discountPrice, countInStock,purchaseCount, category, specifications, isFeatured } = req.body;
 
     // Parse specifications if sent as string
     let specs = [];
@@ -200,6 +203,7 @@ exports.createProduct = async (req, res) => {
       countInStock: countInStock || 0,
       category: category || "",
       isFeatured,
+      purchaseCount,
     });
     const createdProduct = await product.save();
     res.status(201).json(createdProduct);

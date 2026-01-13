@@ -46,8 +46,10 @@ exports.createOrder = async (req, res) => {
         imageUrl: prod.imageUrl,
       });
 
-      // Decrement stock
+      // Decrement stock and Increment purchase count
       prod.countInStock -= qty;
+      const oldPurchaseCount = prod.purchaseCount || 0;
+      prod.purchaseCount = oldPurchaseCount + qty;
       await prod.save({ session });
     }
 
@@ -142,7 +144,6 @@ exports.updateOrderStatus = async (req, res) => {
     res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
-// exports.updateToDelivered = async (req, res) => {
 //   try {
 //     const order = await Order.findById(req.params.id);
 

@@ -157,6 +157,7 @@ const ProductsPage = () => {
                 <option value="price-desc">Price: High to Low</option>
                 <option value="name-asc">Name: A-Z</option>
                 <option value="name-desc">Name: Z-A</option>
+                <option value="trending">Trending</option>
               </select>
             </div>
             <div className="text-sm text-gray-600">

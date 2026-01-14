@@ -15,6 +15,7 @@ export default function ProfilePage() {
     district: "",
     address: ""
   });
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
   const handleEditClick = () => {
@@ -24,18 +25,57 @@ export default function ProfilePage() {
       district: user.district || "",
       address: user.address || ""
     });
+    setErrors({}); // clear previous errors when opening editor
     setIsEditing(true);
+  };
+
+  const validatePhoneNumber = (number) => {
+    const phoneRegex = /^01\d{9}$/;
+    if (!number) return "Phone number is required";
+    if (!phoneRegex.test(number)) {
+      return "Phone number must be 11 digits and start with '01'";
+    }
+    return "";
+  };
+
+  // Intercept input while typing:
+  const handlePhoneChange = (e) => {
+    const raw = e.target.value;
+    const digits = raw.replace(/\D/g, ''); // remove non-digit chars
+
+    // If user typed a prefix that can't be valid, block the change and show helpful error
+    if (digits.length >= 2 && !digits.startsWith("01")) {
+      setErrors({ ...errors, phoneNumber: "Phone number must start with 01" });
+    }
+
+    // Prevent more than 11 digits
+    if (digits.length > 11) {
+      setErrors({ ...errors, phoneNumber: "Phone number cannot exceed 11 digits" });
+    }
+
+    // Clear phone-specific errors while user types valid partial input
+    setErrors({ ...errors, phoneNumber: "" });
+    setFormData({ ...formData, phoneNumber: digits });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    const error = validatePhoneNumber(formData.phoneNumber);
+    if (error) {
+      setErrors({ ...errors, phoneNumber: error });
+      setLoading(false); // <-- make sure to reset loading on validation failure
+      return;
+    }
+
     try {
       await updateProfile(formData);
       toast.success("Profile updated successfully");
       setIsEditing(false);
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to update profile");
+    } catch (err) {
+      // keep error handling generic and safe
+      toast.error(err.response?.data?.message || "Failed to update profile");
     } finally {
       setLoading(false);
     }
@@ -126,9 +166,13 @@ export default function ProfilePage() {
           <Input
             label="Phone Number"
             value={formData.phoneNumber}
-            onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+            onChange={handlePhoneChange}
             placeholder="e.g. 01700000000"
             required
+            type="tel"
+            pattern="^01\d{9}$"
+            error={errors.phoneNumber}
+            helperText="Must start with 01 and be 11 digits"
           />
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">

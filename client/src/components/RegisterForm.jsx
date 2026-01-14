@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 import { loginWithGoogle, registerWithEmail } from "../firebase";
+import { validateEmail, validateMatch, validatePassword, validateRequired } from "../utils/validators";
 import Button from "./ui/Button";
 import Input from "./ui/Input";
 
@@ -15,7 +16,8 @@ export default function RegisterForm() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [photo, setPhoto] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
+  const [globalError, setGlobalError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -24,29 +26,47 @@ export default function RegisterForm() {
     if (file) {
       // Validate file size (5MB)
       if (file.size > 5 * 1024 * 1024) {
-        setError("Image must be under 5MB");
+        setGlobalError("Image must be under 5MB");
         return;
       }
       
       // Validate file type
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
       if (!allowedTypes.includes(file.type)) {
-        setError("Only JPG, PNG, and WEBP images are allowed");
+        setGlobalError("Only JPG, PNG, and WEBP images are allowed");
         return;
       }
       
       setPhoto(file);
       setPhotoPreview(URL.createObjectURL(file));
-      setError("");
+      setGlobalError("");
     }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    const nameError = validateRequired(name, "Full Name");
+    if (nameError) newErrors.name = nameError;
+
+    const emailError = validateEmail(email);
+    if (emailError) newErrors.email = emailError;
+
+    const passwordError = validatePassword(password);
+    if (passwordError) newErrors.password = passwordError;
+
+    const confirmPasswordError = validateMatch(password, confirmPassword, "Passwords");
+    if (confirmPasswordError) newErrors.confirmPassword = confirmPasswordError;
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setGlobalError("");
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
+    if (!validateForm()) {
       return;
     }
 
@@ -90,7 +110,7 @@ export default function RegisterForm() {
 
       navigate("/"); // Redirect to home on success
     } catch (err) {
-      setError(err.message);
+      setGlobalError(err.message);
     } finally {
       setLoading(false);
     }
@@ -101,7 +121,7 @@ export default function RegisterForm() {
       await loginWithGoogle();
       navigate("/"); // Redirect to home
     } catch (err) {
-      setError(err.message);
+      setGlobalError(err.message);
       console.error(err);
     }
   };
@@ -121,9 +141,9 @@ export default function RegisterForm() {
           </div>
 
           {/* Error Message */}
-          {error && (
+          {globalError && (
             <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm animate-fade-in">
-              {error}
+              {globalError}
             </div>
           )}
 
@@ -134,7 +154,11 @@ export default function RegisterForm() {
               label="Full Name"
               placeholder="John Doe"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                if (errors.name) setErrors({...errors, name: null});
+              }}
+              error={errors.name}
               leftIcon={<UserCircleIcon className="w-5 h-5" />}
               required
             />
@@ -144,7 +168,11 @@ export default function RegisterForm() {
               label="Email Address"
               placeholder="you@example.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (errors.email) setErrors({...errors, email: null});
+              }}
+              error={errors.email}
               leftIcon={<EnvelopeIcon className="w-5 h-5" />}
               required
             />
@@ -154,7 +182,11 @@ export default function RegisterForm() {
               label="Password"
               placeholder="Create a password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (errors.password) setErrors({...errors, password: null});
+              }}
+              error={errors.password}
               leftIcon={<LockClosedIcon className="w-5 h-5" />}
               required
             />
@@ -164,7 +196,11 @@ export default function RegisterForm() {
               label="Confirm Password"
               placeholder="Confirm your password"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                if (errors.confirmPassword) setErrors({...errors, confirmPassword: null});
+              }}
+              error={errors.confirmPassword}
               leftIcon={<LockClosedIcon className="w-5 h-5" />}
               required
             />

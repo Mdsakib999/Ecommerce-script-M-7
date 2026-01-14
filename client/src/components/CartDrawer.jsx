@@ -67,7 +67,7 @@ export default function CartDrawer() {
                       <div className="flex-1 flex flex-col">
                         <div className="flex justify-between text-base font-medium text-gray-900">
                           <h3 className="line-clamp-1">{item.name}</h3>
-                          <p className="ml-4 whitespace-nowrap">৳{item.price * item.qty}</p>
+                          <p className="ml-4 whitespace-nowrap">৳{(item.price * item.qty).toFixed(2)}</p>
                         </div>
                         
                         <div className="flex-1 flex items-end justify-between text-sm">

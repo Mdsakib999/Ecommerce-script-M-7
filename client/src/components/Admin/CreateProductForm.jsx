@@ -1,15 +1,16 @@
 import {
-  CubeIcon,
-  CurrencyDollarIcon,
-  DocumentTextIcon,
-  FolderIcon,
-  MinusIcon,
-  PhotoIcon,
-  PlusIcon,
-  TagIcon,
+    CubeIcon,
+    CurrencyDollarIcon,
+    DocumentTextIcon,
+    FolderIcon,
+    MinusIcon,
+    PhotoIcon,
+    PlusIcon,
+    TagIcon,
 } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
+import { validatePositiveNumber, validateRequired } from "../../utils/validators";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 
@@ -25,7 +26,8 @@ export default function CreateProductForm({ onProductCreated, token }) {
   const [specifications, setSpecifications] = useState([
     { key: "", value: "" },
   ]);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
+  const [globalError, setGlobalError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -58,10 +60,46 @@ export default function CreateProductForm({ onProductCreated, token }) {
     setSpecifications(values);
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    const nameError = validateRequired(name, "Product Name");
+    if (nameError) newErrors.name = nameError;
+
+    const priceError = validateRequired(price, "Price") || validatePositiveNumber(price, "Price");
+    if (priceError) newErrors.price = priceError;
+
+    if (discountPrice) {
+       const discountError = validatePositiveNumber(discountPrice, "Discount Price");
+       if (discountError) newErrors.discountPrice = discountError;
+    }
+
+    const stockError = validateRequired(countInStock, "Stock Quantity") || validatePositiveNumber(countInStock, "Stock Quantity");
+    if (stockError) newErrors.countInStock = stockError;
+
+    const categoryError = validateRequired(category, "Category");
+    if (categoryError) newErrors.category = categoryError;
+
+    if (!image) {
+      newErrors.image = "Product Image is required";
+    }
+
+    const descriptionError = validateRequired(description, "Description");
+    if (descriptionError) newErrors.description = descriptionError;
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setGlobalError("");
     setSuccess(false);
+
+    if (!validateForm()) {
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -106,10 +144,11 @@ export default function CreateProductForm({ onProductCreated, token }) {
       setCategory("");
       setIsFeatured(false);
       setSpecifications([{ key: "", value: "" }]);
+      setErrors({});
 
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      setError(
+      setGlobalError(
         err.response?.data?.message || err.message || "Failed to create product"
       );
     } finally {
@@ -137,9 +176,9 @@ export default function CreateProductForm({ onProductCreated, token }) {
       )}
 
       {/* Error Message */}
-      {error && (
+      {globalError && (
         <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm mb-6 animate-fade-in">
-          {error}
+          {globalError}
         </div>
       )}
 
@@ -152,7 +191,11 @@ export default function CreateProductForm({ onProductCreated, token }) {
             label="Product Name"
             placeholder="Enter product name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              if (errors.name) setErrors({...errors, name: null});
+            }}
+            error={errors.name}
             leftIcon={<TagIcon className="w-5 h-5" />}
             required
           />
@@ -167,9 +210,14 @@ export default function CreateProductForm({ onProductCreated, token }) {
             </label>
             <select
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={(e) => {
+                setCategory(e.target.value);
+                if (errors.category) setErrors({...errors, category: null});
+              }}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white ${
+                errors.category ? "border-red-500" : "border-gray-300"
+              }`}
             >
               <option value="">Select Category</option>
               {categories.map((cat) => (
@@ -178,6 +226,9 @@ export default function CreateProductForm({ onProductCreated, token }) {
                 </option>
               ))}
             </select>
+            {errors.category && (
+              <p className="text-sm text-red-600 mt-1">{errors.category}</p>
+            )}
           </div>
 
           {/* Price */}
@@ -186,7 +237,11 @@ export default function CreateProductForm({ onProductCreated, token }) {
             label="Price (৳)"
             placeholder="0.00"
             value={price}
-            onChange={(e) => setPrice(e.target.value)}
+            onChange={(e) => {
+              setPrice(e.target.value);
+              if (errors.price) setErrors({...errors, price: null});
+            }}
+            error={errors.price}
             leftIcon={<CurrencyDollarIcon className="w-5 h-5" />}
             step="0.01"
             min="0"
@@ -199,7 +254,11 @@ export default function CreateProductForm({ onProductCreated, token }) {
             label="Discount Price (৳) (Optional)"
             placeholder="0.00"
             value={discountPrice}
-            onChange={(e) => setDiscountPrice(e.target.value)}
+            onChange={(e) => {
+              setDiscountPrice(e.target.value);
+              if (errors.discountPrice) setErrors({...errors, discountPrice: null});
+            }}
+            error={errors.discountPrice}
             leftIcon={<CurrencyDollarIcon className="w-5 h-5" />}
             step="0.01"
             min="0"
@@ -211,7 +270,11 @@ export default function CreateProductForm({ onProductCreated, token }) {
             label="Stock Quantity"
             placeholder="0"
             value={countInStock}
-            onChange={(e) => setCountInStock(e.target.value)}
+            onChange={(e) => {
+              setCountInStock(e.target.value);
+              if (errors.countInStock) setErrors({...errors, countInStock: null});
+            }}
+            error={errors.countInStock}
             leftIcon={<CubeIcon className="w-5 h-5" />}
             min="0"
             required
@@ -235,7 +298,11 @@ export default function CreateProductForm({ onProductCreated, token }) {
           type="file"
           label="Product Image"
           accept="image/*"
-          onChange={(e) => setImage(e.target.files[0])}
+          onChange={(e) => {
+            setImage(e.target.files[0]);
+             if (errors.image) setErrors({...errors, image: null});
+          }}
+          error={errors.image}
           leftIcon={<PhotoIcon className="w-5 h-5" />}
           required
         />
@@ -250,12 +317,20 @@ export default function CreateProductForm({ onProductCreated, token }) {
           </label>
           <textarea
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => {
+              setDescription(e.target.value);
+              if (errors.description) setErrors({...errors, description: null});
+            }}
             placeholder="Enter product description"
             rows="4"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all resize-none"
+            className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all resize-none ${
+              errors.description ? "border-red-500" : "border-gray-300"
+            }`}
             required
           />
+          {errors.description && (
+             <p className="text-sm text-red-600 mt-1">{errors.description}</p>
+          )}
         </div>
 
         {/* Specifications */}

@@ -2,26 +2,45 @@ import { EnvelopeIcon, LockClosedIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { loginWithEmail, loginWithGoogle } from "../firebase";
+import { validateEmail, validatePassword } from "../utils/validators";
 import Button from "./ui/Button";
 import Input from "./ui/Input";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
+  const [globalError, setGlobalError] = useState(""); // Renamed from 'error' to 'globalError' to distinguish from field errors
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const validateForm = () => {
+    const newErrors = {};
+    const emailError = validateEmail(email);
+    if (emailError) newErrors.email = emailError;
+
+    const passwordError = validatePassword(password);
+    if (passwordError) newErrors.password = passwordError;
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setGlobalError("");
+    
+    if (!validateForm()) {
+      return;
+    }
+
     setLoading(true);
     
     try {
       await loginWithEmail(email, password);
       navigate("/"); // Redirect to home
     } catch (err) {
-      setError(err.message);
+      setGlobalError(err.message);
     } finally {
       setLoading(false);
     }
@@ -32,7 +51,7 @@ export default function LoginForm() {
       await loginWithGoogle();
       navigate("/"); // Redirect to home
     } catch (err) {
-      setError(err.message);
+      setGlobalError(err.message);
       console.error(err);
     }
   };
@@ -52,9 +71,9 @@ export default function LoginForm() {
           </div>
 
           {/* Error Message */}
-          {error && (
+          {globalError && (
             <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm animate-fade-in">
-              {error}
+              {globalError}
             </div>
           )}
 
@@ -65,7 +84,12 @@ export default function LoginForm() {
               label="Email Address"
               placeholder="you@example.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                // Clear error on change if needed, or wait for next submit
+                if (errors.email) setErrors({...errors, email: null});
+              }}
+              error={errors.email}
               leftIcon={<EnvelopeIcon className="w-5 h-5" />}
               required
             />
@@ -75,7 +99,11 @@ export default function LoginForm() {
               label="Password"
               placeholder="Enter your password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (errors.password) setErrors({...errors, password: null});
+              }}
+              error={errors.password}
               leftIcon={<LockClosedIcon className="w-5 h-5" />}
               required
             />

@@ -187,7 +187,7 @@ export default function Contact() {
                 </p>
                 
                 {/* Map Placeholder */}
-                <div className="aspect-[4/3] bg-slate-100 rounded-2xl overflow-hidden border border-slate-200">
+                {/* <div className="aspect-[4/3] bg-slate-100 rounded-2xl overflow-hidden border border-slate-200">
                   <iframe
                     title="Athletora Location"
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3651.9050892677305!2d90.39167431498094!3d23.750852284587977!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755b8b7a55cd36f%3A0xfcc5b021faff43ea!2sDhaka%2C%20Bangladesh!5e0!3m2!1sen!2sbd!4v1234567890123!5m2!1sen!2sbd"
@@ -198,7 +198,7 @@ export default function Contact() {
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
                   ></iframe>
-                </div>
+                </div> */}
               </div>
 
               {/* Business Hours */}

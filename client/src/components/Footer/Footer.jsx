@@ -7,7 +7,6 @@ import {
 } from "@heroicons/react/24/outline";
 import { Link } from "react-router";
 import Button from "../ui/Button";
-import React from "react";
 export default function Footer() {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -127,7 +126,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    to="/login"
+                    to="/dashboard"
                     className="text-gray-300 hover:text-white transition-colors text-sm cursor-pointer"
                   >
                     My Account
@@ -141,36 +140,20 @@ export default function Footer() {
               <h3 className="text-lg font-semibold mb-4">Customer Service</h3>
               <ul className="space-y-2">
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/contact"
                     className="text-gray-300 hover:text-white transition-colors text-sm cursor-pointer"
                   >
                     Contact Us
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/contact"
                     className="text-gray-300 hover:text-white transition-colors text-sm cursor-pointer"
                   >
                     FAQs
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-300 hover:text-white transition-colors text-sm cursor-pointer"
-                  >
-                    Shipping & Returns
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-300 hover:text-white transition-colors text-sm cursor-pointer"
-                  >
-                    Privacy Policy
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>

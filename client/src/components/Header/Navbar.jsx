@@ -66,10 +66,34 @@ export default function Navbar() {
 
   return (
     <header
-      className={`sticky top-0 z-1000 border-b shadow-md transition-all duration-300 ${
-        isScrolled ? "bg-white border-gray-200" : "glass border-white/20"
+      className={`sticky top-0 z-50 border-b shadow-md transition-all duration-300 ${
+        isScrolled ? "bg-white border-gray-200" : "bg-white/10 backdrop-blur-md border-none shadow-lg"
       }`}
     >
+      {/* Subheader */}
+      <div
+        className={`w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white overflow-hidden transition-all duration-300 ease-in-out ${
+          isScrolled ? "h-0 opacity-0" : "h-10 opacity-100"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-end gap-6 text-xs font-medium uppercase tracking-wider">
+          <Link to="/" className="hover:text-cyan-400 transition-colors">
+            Home
+          </Link>
+          <div className="w-px h-3 bg-gray-500"></div>
+          <Link to="/about" className="hover:text-cyan-400 transition-colors">
+            About
+          </Link>
+          <div className="w-px h-3 bg-gray-500"></div>
+          <Link to="/products" className="hover:text-cyan-400 transition-colors">
+            Products
+          </Link>
+          <div className="w-px h-3 bg-gray-500"></div>
+          <Link to="/contact" className="hover:text-cyan-400 transition-colors">
+            Contact
+          </Link>
+        </div>
+      </div>
       <nav
         ref={mobileMenuRef}
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
@@ -84,59 +108,6 @@ export default function Navbar() {
               Athletora
             </span>
           </Link>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
-            <Link
-              to="/"
-              className={`text-gray-700 hover:text-cyan-600 transition-colors relative group ${
-                location.pathname === "/" ? "text-cyan-600 font-semibold" : ""
-              }`}
-            >
-              Home
-              {location.pathname === "/" && (
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-accent transform scale-x-100 transition-transform origin-left"></span>
-              )}
-            </Link>
-
-            <Link
-              to="/about"
-              className={`text-gray-700 hover:text-cyan-600 transition-colors relative group ${
-                location.pathname === "/about" ? "text-cyan-600 font-semibold" : ""
-              }`}
-            >
-              About Us
-              {location.pathname === "/about" && (
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-accent transform scale-x-100 transition-transform origin-left"></span>
-              )}
-            </Link>
-
-            <Link
-              to="/products"
-              className={`text-gray-700 hover:text-cyan-600 transition-colors relative group ${
-                location.pathname === "/products"
-                  ? "text-cyan-600 font-semibold"
-                  : ""
-              }`}
-            >
-              Products
-              {location.pathname === "/products" && (
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-accent transform scale-x-100 transition-transform origin-left"></span>
-              )}
-            </Link>
-
-            <Link
-              to="/contact"
-              className={`text-gray-700 hover:text-cyan-600 transition-colors relative group ${
-                location.pathname === "/contact" ? "text-cyan-600 font-semibold" : ""
-              }`}
-            >
-              Contact
-              {location.pathname === "/contact" && (
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-accent transform scale-x-100 transition-transform origin-left"></span>
-              )}
-            </Link>
-          </div>
 
           {/* Search Bar */}
           <div className="hidden md:flex flex-1 max-w-lg mx-8">

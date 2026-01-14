@@ -9,14 +9,12 @@ const orderRoutes = require('./routes/orders');
 const userRoutes = require('./routes/users')
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://shopera-client.vercel.app"
+  "https://shopera-client.vercel.app",
+  "https://athletora-limited.netlify.app",
 ];
 const app = express();
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://shopera-client.vercel.app",
-  ],
+  origin: allowedOrigins,
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]
@@ -35,7 +33,7 @@ const multer = require("multer");
 
 //? Routes
 app.use('/api/products', productRoutes);
-app.use('/api/categories',categoryRoutes);
+app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes)
 app.use((err, req, res, next) => {

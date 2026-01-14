@@ -18,7 +18,7 @@ export default function CartDrawer() {
         onClick={closeCart}
       />
 
-      <div className="fixed inset-y-0 right-0 max-w-full flex top-16">
+      <div className="fixed inset-y-0 right-0 max-w-full flex top-0 z-100">
         <div className="w-screen max-w-md transform transition ease-in-out duration-500 sm:duration-700 animate-slide-in-right">
           <div className="h-full flex flex-col bg-white shadow-2xl">
             {/* Header */}

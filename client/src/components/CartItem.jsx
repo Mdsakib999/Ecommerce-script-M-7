@@ -2,7 +2,7 @@ import { MinusIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useCart } from "../context/CartContext";
 import Button from "./ui/Button";
 
-export default function CartItem({ item }) {
+export default function CartItem({ item, onRemove }) {
   const { updateQty, removeFromCart } = useCart();
 
   const decrementQty = () => {
@@ -67,7 +67,7 @@ export default function CartItem({ item }) {
           </div>
 
           <Button
-            onClick={() => removeFromCart(item.productId)}
+            onClick={() => onRemove ? onRemove(item.productId) : removeFromCart(item.productId)}
             variant="ghost"
             size="sm"
             className="text-red-600 hover:text-red-700 hover:bg-red-50 p-2"

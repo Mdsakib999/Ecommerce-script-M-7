@@ -1,7 +1,7 @@
 import {
-  ArrowRightIcon,
-  ShieldCheckIcon,
-  ShoppingBagIcon,
+    ArrowRightIcon,
+    ShieldCheckIcon,
+    ShoppingBagIcon,
 } from "@heroicons/react/24/outline";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router";
@@ -9,16 +9,23 @@ import { toast } from "sonner";
 import { placeOrder } from "../api/order";
 import CartItem from "../components/CartItem";
 import Button from "../components/ui/Button";
+import ConfirmationModal from "../components/ui/ConfirmationModal";
 import Input from "../components/ui/Input";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 
 export default function CartPage() {
-  const { cart, clearCart } = useCart();
+  const { cart, clearCart, removeFromCart } = useCart();
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const { user, updateProfile } = useAuth();
+  
+  const [confirmModal, setConfirmModal] = useState({ 
+    open: false, 
+    type: null, // "remove" | "clear"
+    itemId: null 
+  });
 
   const [shippingInfo, setShippingInfo] = useState({
     phoneNumber: user?.phoneNumber || "",
@@ -124,6 +131,25 @@ export default function CartPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRemoveClick = (id) => {
+    setConfirmModal({ open: true, type: "remove", itemId: id });
+  };
+
+  const handleClearCartClick = () => {
+    setConfirmModal({ open: true, type: "clear", itemId: null });
+  };
+
+  const handleConfirmAction = async () => {
+    if (confirmModal.type === "remove" && confirmModal.itemId) {
+      removeFromCart(confirmModal.itemId);
+      toast.success("Item removed from cart");
+    } else if (confirmModal.type === "clear") {
+      clearCart();
+      toast.success("Cart cleared");
+    }
+    setConfirmModal({ open: false, type: null, itemId: null });
   };
 
   return (
@@ -244,13 +270,13 @@ export default function CartPage() {
                     key={item.productId}
                     className="bg-white rounded-xl shadow-sm overflow-hidden animate-fade-in"
                   >
-                    <CartItem item={item} />
+                    <CartItem item={item} onRemove={handleRemoveClick} />
                   </div>
                 ))}
 
                 {/* Clear Cart Button */}
                 <Button
-                  onClick={clearCart}
+                  onClick={handleClearCartClick}
                   variant="ghost"
                   className="w-auto ml-auto text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-300 hover:border-red-400"
                 >
@@ -336,6 +362,19 @@ export default function CartPage() {
           </div>
         )}
       </div>
+      
+      <ConfirmationModal
+        isOpen={confirmModal.open}
+        onClose={() => setConfirmModal({ ...confirmModal, open: false })}
+        onConfirm={handleConfirmAction}
+        title={confirmModal.type === "clear" ? "Clear Cart" : "Remove Item"}
+        message={
+          confirmModal.type === "clear"
+            ? "Are you sure you want to remove all items from your cart?"
+            : "Are you sure you want to remove this item from your cart?"
+        }
+        confirmText="Remove"
+      />
     </div>
   );
 }

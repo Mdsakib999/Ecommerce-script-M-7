@@ -6,11 +6,14 @@ import { useAuth } from "../../context/AuthContext";
 import Loader from "../Loader";
 import Message from "../Message";
 import Button from "../ui/Button";
+import ConfirmationModal from "../ui/ConfirmationModal";
 
 export default function UserAdmin() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [deleteModal, setDeleteModal] = useState({ open: false, id: null });
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const { token, user: currentUser } = useAuth();
 
   const fetchUsers = async () => {
@@ -61,26 +64,25 @@ export default function UserAdmin() {
     });
   };
 
-  const handleDelete = (userId) => {
-    toast("Are you sure you want to delete this user? This action cannot be undone.", {
-        action: {
-            label: 'Delete',
-            onClick: async () => {
-                try {
-                  await api.delete(`/api/users/${userId}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                  });
-                  setUsers((prev) => prev.filter((u) => u._id !== userId));
-                  toast.success("User deleted successfully");
-                } catch (err) {
-                  toast.error(err.response?.data?.message || err.message || "Delete failed");
-                }
-            }
-        },
-        cancel: {
-            label: 'Cancel'
-        }
-    });
+  const handleDeleteClick = (userId) => {
+    setDeleteModal({ open: true, id: userId });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteModal.id) return;
+    try {
+      setDeleteLoading(true);
+      await api.delete(`/api/users/${deleteModal.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUsers((prev) => prev.filter((u) => u._id !== deleteModal.id));
+      toast.success("User deleted successfully");
+      setDeleteModal({ open: false, id: null });
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.message || "Delete failed");
+    } finally {
+      setDeleteLoading(false);
+    }
   };
 
   if (loading) return <Loader className="min-h-[60vh]" />;
@@ -173,7 +175,7 @@ export default function UserAdmin() {
                            variant="ghost"
                            size="sm"
                            className="text-red-600 hover:text-red-900 hover:bg-red-50"
-                           onClick={() => handleDelete(user._id)}
+                           onClick={() => handleDeleteClick(user._id)}
                            title="Delete User"
                          >
                            <TrashIcon className="h-5 w-5" />
@@ -193,6 +195,15 @@ export default function UserAdmin() {
             </div>
         )}
       </div>
+
+      <ConfirmationModal
+        isOpen={deleteModal.open}
+        onClose={() => setDeleteModal({ open: false, id: null })}
+        onConfirm={confirmDelete}
+        title="Delete User"
+        message="Are you sure you want to delete this user? This action cannot be undone."
+        isLoading={deleteLoading}
+      />
     </div>
   );
 }

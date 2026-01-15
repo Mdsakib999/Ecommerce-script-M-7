@@ -10,18 +10,17 @@ export default function SearchBar() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!query.trim()) {
-      setProducts([]);
-      return;
-    }
-
     const timeout = setTimeout(async () => {
+      if (!query.trim()) {
+        setProducts([]);
+        return;
+      }
       try {
         const { data } = await api.get(`/api/products?keyword=${query}`);
         setProducts(data.products || []);
       } catch (error) {
         console.error(error);
-      } 
+      }
     }, 400); // debounce
 
     return () => clearTimeout(timeout);
@@ -42,7 +41,7 @@ export default function SearchBar() {
       {/* Search Results Dropdown - Fixed z-index for mobile */}
       {focused && query && (
         <ul className="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-9999 max-h-80 overflow-auto">
-          { products.length === 0 ? (
+          {products.length === 0 ? (
             <li className="px-4 py-6 text-center text-gray-500 font-serif">
               No products found. Try a different search.
             </li>

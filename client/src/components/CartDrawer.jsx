@@ -1,14 +1,34 @@
 import { MinusIcon, PlusIcon, ShoppingCartIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useState } from "react";
 import { Link } from "react-router";
+import { toast } from "sonner";
 import { useCart } from "../context/CartContext";
 import Button from "./ui/Button";
+import ConfirmationModal from "./ui/ConfirmationModal";
 
 export default function CartDrawer() {
   const { cart, isCartOpen, closeCart, updateQty, removeFromCart } = useCart();
+  const [confirmModal, setConfirmModal] = useState({ 
+    open: false, 
+    type: null, // "remove" | "clear" | null
+    itemId: null 
+  });
 
   const subtotal = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
 
   if (!isCartOpen) return null;
+
+  const handleRemoveClick = (id) => {
+    setConfirmModal({ open: true, type: "remove", itemId: id });
+  };
+
+  const handleConfirmAction = () => {
+    if (confirmModal.type === "remove" && confirmModal.itemId) {
+      removeFromCart(confirmModal.itemId);
+      toast.success("Item removed from cart");
+    }
+    setConfirmModal({ open: false, type: null, itemId: null });
+  };
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
@@ -90,7 +110,7 @@ export default function CartDrawer() {
 
                           <button
                             type="button"
-                            onClick={() => removeFromCart(item.productId)}
+                            onClick={() => handleRemoveClick(item.productId)}
                             className="flex items-center gap-1 font-medium text-red-600 hover:text-red-500 transition-colors"
                           >
                             <TrashIcon className="w-4 h-4" />
@@ -133,6 +153,15 @@ export default function CartDrawer() {
           </div>
         </div>
       </div>
+
+      <ConfirmationModal
+        isOpen={confirmModal.open}
+        onClose={() => setConfirmModal({ ...confirmModal, open: false })}
+        onConfirm={handleConfirmAction}
+        title="Remove Item"
+        message="Are you sure you want to remove this item from your cart?"
+        confirmText="Remove"
+      />
     </div>
   );
 }

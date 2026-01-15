@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import Loader from "../Loader";
 import Message from "../Message";
 import Button from "../ui/Button";
+import ConfirmationModal from "../ui/ConfirmationModal";
 import Modal from "../ui/Modal";
 
 export default function CategoryAdmin() {
@@ -15,6 +16,8 @@ export default function CategoryAdmin() {
   const [showForm, setShowForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [formData, setFormData] = useState({ name: "" });
+  const [deleteModal, setDeleteModal] = useState({ open: false, id: null });
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const { token } = useAuth();
 
   const fetchCategories = async () => {
@@ -61,26 +64,25 @@ export default function CategoryAdmin() {
     }
   };
 
-  const handleDelete = (id) => {
-    toast("Are you sure you want to delete this category?", {
-      action: {
-        label: "Delete",
-        onClick: async () => {
-          try {
-            await api.delete(`/api/categories/${id}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            setCategories((prev) => prev.filter((cat) => cat._id !== id));
-            toast.success("Category deleted successfully");
-          } catch (err) {
-            toast.error(err.response?.data?.message || "Delete failed");
-          }
-        },
-      },
-      cancel: {
-        label: "Cancel",
-      },
-    });
+  const handleDeleteClick = (id) => {
+    setDeleteModal({ open: true, id });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteModal.id) return;
+    try {
+      setDeleteLoading(true);
+      await api.delete(`/api/categories/${deleteModal.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCategories((prev) => prev.filter((cat) => cat._id !== deleteModal.id));
+      toast.success("Category deleted successfully");
+      setDeleteModal({ open: false, id: null });
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Delete failed");
+    } finally {
+      setDeleteLoading(false);
+    }
   };
 
   const handleEdit = (category) => {
@@ -149,7 +151,7 @@ export default function CategoryAdmin() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDelete(category._id)}
+                        onClick={() => handleDeleteClick(category._id)}
                         className="text-red-600 hover:text-red-700"
                       >
                         <TrashIcon className="w-4 h-4" />
@@ -194,6 +196,15 @@ export default function CategoryAdmin() {
           </div>
         </form>
       </Modal>
+
+      <ConfirmationModal
+        isOpen={deleteModal.open}
+        onClose={() => setDeleteModal({ open: false, id: null })}
+        onConfirm={confirmDelete}
+        title="Delete Category"
+        message="Are you sure you want to delete this category? This might affect products using it."
+        isLoading={deleteLoading}
+      />
     </div>
   );
 }

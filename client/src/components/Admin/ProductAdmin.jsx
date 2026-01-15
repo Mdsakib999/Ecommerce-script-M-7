@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import Loader from "../Loader";
 import Message from "../Message";
 import Button from "../ui/Button";
+import ConfirmationModal from "../ui/ConfirmationModal";
 import CreateProductForm from "./CreateProductForm";
 import UpdateProductForm from "./UpdateProductForm";
 
@@ -15,6 +16,8 @@ export default function ProductAdmin() {
   const [error, setError] = useState();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [deleteModal, setDeleteModal] = useState({ open: false, id: null });
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const { token } = useAuth();
 
   // Fetch Products
@@ -58,32 +61,32 @@ export default function ProductAdmin() {
     setEditingProduct(null);
   };
 
-  // Handle Delete Product
-  function handleDelete(id) {
-    toast("Are you sure you want to delete this product?", {
-      action: {
-        label: "Delete",
-        onClick: async () => {
-          try {
-            await api.delete(`/api/products/${id}`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-            // Remove deleted product from state list
-            setProducts((prev) => prev.filter((p) => p._id !== id));
-            toast.success("Product deleted successfully");
-          } catch (error) {
-            console.error(error);
-            toast.error("Failed to delete product");
-          }
-        }
-      },
-      cancel: {
-        label: "Cancel"
-      }
-    });
+  // Open Delete Modal
+  function handleDeleteClick(id) {
+    setDeleteModal({ open: true, id });
   }
+
+  // Confirm Delete Action
+  const confirmDelete = async () => {
+    if (!deleteModal.id) return;
+    try {
+      setDeleteLoading(true);
+      await api.delete(`/api/products/${deleteModal.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      // Remove deleted product from state list
+      setProducts((prev) => prev.filter((p) => p._id !== deleteModal.id));
+      toast.success("Product deleted successfully");
+      setDeleteModal({ open: false, id: null });
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete product");
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
 
   if (loading) return <Loader className="min-h-[60vh]" />;
 
@@ -247,7 +250,7 @@ export default function ProductAdmin() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDelete(product._id)}
+                        onClick={() => handleDeleteClick(product._id)}
                         leftIcon={<TrashIcon className="w-4 h-4" />}
                         className="text-red-600 hover:text-red-700 hover:bg-red-50"
                       >
@@ -277,6 +280,15 @@ export default function ProductAdmin() {
           </div>
         )}
       </div>
+
+      <ConfirmationModal
+        isOpen={deleteModal.open}
+        onClose={() => setDeleteModal({ open: false, id: null })}
+        onConfirm={confirmDelete}
+        title="Delete Product"
+        message="Are you sure you want to delete this product? This action cannot be undone."
+        isLoading={deleteLoading}
+      />
     </div>
   );
 }

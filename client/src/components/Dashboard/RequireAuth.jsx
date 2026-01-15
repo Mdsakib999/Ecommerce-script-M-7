@@ -6,7 +6,7 @@ export default function RequireAuth({ children }) {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <Loader fullPage />;
+    return <Loader className="min-h-[50vh]" />;
   }
 
   if (!user) {

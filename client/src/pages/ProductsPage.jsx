@@ -123,7 +123,12 @@ const ProductsPage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (initialLoading) return <Loader fullPage />;
+  if (initialLoading)
+    return (
+      <div className="min-h-screen pt-20">
+        <Loader />
+      </div>
+    );
   if (error)
     return (
       <div className="p-6">

@@ -1,0 +1,12 @@
+# Helper Script to Find FullPage Loader Usage
+# This script is a placeholder/reminder of what we found.
+# Key files to modify:
+# - client/src/pages/ProductsPage.jsx
+# - client/src/pages/ProductDetailsPage.jsx
+# - client/src/pages/Dashboard/MyOrdersPage.jsx
+# - client/src/components/Admin/ProductAdmin.jsx
+# - client/src/components/Admin/UserAdmin.jsx
+# - client/src/components/Admin/OrderAdmin.jsx
+# - client/src/components/Admin/CategoryAdmin.jsx
+
+# We will remove `fullPage` prop and wrap in a centering div if needed.

@@ -7,7 +7,6 @@ export default function SearchBar() {
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,14 +17,11 @@ export default function SearchBar() {
 
     const timeout = setTimeout(async () => {
       try {
-        setLoading(true);
         const { data } = await api.get(`/api/products?keyword=${query}`);
         setProducts(data.products || []);
       } catch (error) {
         console.error(error);
-      } finally {
-        setLoading(false);
-      }
+      } 
     }, 400); // debounce
 
     return () => clearTimeout(timeout);
@@ -46,9 +42,7 @@ export default function SearchBar() {
       {/* Search Results Dropdown - Fixed z-index for mobile */}
       {focused && query && (
         <ul className="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-9999 max-h-80 overflow-auto">
-          {loading ? (
-            <Loader fullPage />
-          ) : products.length === 0 ? (
+          { products.length === 0 ? (
             <li className="px-4 py-6 text-center text-gray-500 font-serif">
               No products found. Try a different search.
             </li>

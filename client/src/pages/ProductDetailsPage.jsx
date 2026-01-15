@@ -79,7 +79,12 @@ const ProductDetailsPage = () => {
     }
   };
 
-  if (loading) return <Loader fullPage />;
+  if (loading)
+    return (
+      <div className="min-h-screen pt-20">
+        <Loader />
+      </div>
+    );
   if (error)
     return (
       <div className="p-6 max-w-4xl mx-auto">

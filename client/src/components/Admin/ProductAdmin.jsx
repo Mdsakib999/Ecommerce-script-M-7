@@ -85,7 +85,7 @@ export default function ProductAdmin() {
     });
   }
 
-  if (loading) return <Loader fullPage />;
+  if (loading) return <Loader className="min-h-[60vh]" />;
 
   if (error) return <Message type="error">{error}</Message>;
 
